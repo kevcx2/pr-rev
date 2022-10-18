@@ -16,7 +16,10 @@ export function listAllShifts(): Promise<Shift[]> {
 export function listHealthCareFacilityShifts(
   facilityUuid: HealthCareFacility["uuid"],
 ): Promise<Shift[]> {
-  return prisma.shift.findMany({ where: { facilityUuid } });
+  return prisma.shift.findMany({
+    where: { facilityUuid },
+    include: { shiftAssignments: true },
+  });
 }
 
 export function listWorkerShifts(
@@ -53,5 +56,21 @@ export function applyToShift(
       shift: { connect: { uuid: shiftUuid } },
       worker: { connect: { uuid: workerUuid } },
     },
+  });
+}
+
+export function rateWorker(
+  workerUuid: Worker["uuid"],
+  shiftUuid: Shift["uuid"],
+  rating: number,
+): Promise<ShiftAssignment> {
+  return prisma.shiftAssignment.update({
+    where: {
+      shiftUuid_workerUuid: {
+        shiftUuid,
+        workerUuid,
+      },
+    },
+    data: { rating },
   });
 }

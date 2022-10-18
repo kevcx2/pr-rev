@@ -42,6 +42,7 @@ model ShiftAssignment {
   workerUuid String
   shift      Shift  @relation(fields: [shiftUuid], references: [uuid])
   worker     Worker @relation(fields: [workerUuid], references: [uuid])
+  rating     Int?
 
   @@id([shiftUuid, workerUuid])
 }

@@ -10,6 +10,7 @@ import {
   listAllShifts,
   listHealthCareFacilityShifts,
   listWorkerShifts,
+  rateWorker,
 } from "../../core/shiftManagement";
 import { createWorker, listWorkers } from "../../core/workerManagement";
 
@@ -57,8 +58,8 @@ v1.post(workersBase, async (req, res) => {
 });
 
 v1.get(`${workersBase}/:uuid/shifts`, async (req, res) => {
-  const shifts = await listWorkerShifts(req.params.uuid);
-  res.send(JSON.stringify({ shifts }));
+  const shiftAssignments = await listWorkerShifts(req.params.uuid);
+  res.send(JSON.stringify({ shiftAssignments }));
 });
 
 v1.post(`${workersBase}/:uuid/shifts`, async (req, res) => {
@@ -74,4 +75,11 @@ const shiftsBase = "/shifts";
 v1.get(shiftsBase, async (req, res) => {
   const shifts = await listAllShifts();
   res.send(JSON.stringify({ shifts }));
+});
+
+// Ratings
+v1.post("/rate-worker", async (req, res) => {
+  const { workerUuid, shiftUuid, rating } = req.body;
+  const shiftAssignment = await rateWorker(workerUuid, shiftUuid, rating);
+  res.send(JSON.stringify({ shiftAssignment }));
 });
