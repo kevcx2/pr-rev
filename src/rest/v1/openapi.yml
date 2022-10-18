@@ -1,0 +1,289 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost/v1
+info:
+  title: ClipboardHealth
+  version: 1.0.0'
+components:
+  schemas:
+    HealthCareFacility:
+      type: object
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+      required:
+        - uuid
+        - name
+    HealthCareFacilityInput:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    Worker:
+      type: object
+      properties:
+        uuid:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        shiftAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShiftAssignment'
+      required:
+        - uuid
+        - firstName
+        - lastName
+    WorkerInput:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required:
+        - firstName
+        - lastName
+    Shift:
+      type: object
+      properties:
+        uuid:
+          type: string
+        facilityUuid:
+          type: string
+        facility:
+          $ref: '#/components/schemas/HealthCareFacility'
+        shiftAssignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShiftAssignment'
+        baseHourlyRate:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        workerSlots:
+          type: integer
+      required:
+        - uuid
+        - facilityUuid
+        - baseHourlyRate
+        - createdAt
+        - updatedAt
+        - startTime
+        - endTime
+        - workerSlots
+    ShiftInput:
+      type: object
+      properties:
+        baseHourlyRate:
+          type: integer
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        workerSlots:
+          type: integer
+      required:
+        - baseHourlyRate
+        - startTime
+        - endTime
+        - workerSlots
+    ShiftAssignment:
+      type: object
+      properties:
+        shiftUuid:
+          type: string
+        workerUuid:
+          type: string
+        shift:
+          $ref: '#/components/schemas/Shift'
+        worker:
+          $ref: '#/components/schemas/Worker'
+      required:
+        - shiftUuid
+        - workerUuid
+    ShiftAssignmentInput:
+      type: object
+      properties:
+        shiftUuid:
+          type: string
+      required:
+        - shiftUuid
+paths:
+  /:
+    summary: The application health check
+    get:
+      responses:
+        '200':
+          description: Successful health check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '500':
+          description: Failed health check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  /facilities:
+    get:
+      responses:
+        '200':
+          description: Get HealthCareFacility list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  facilities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HealthCareFacility'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthCareFacilityInput'
+      responses:
+        '200':
+          description: Successfully created HealthCareFacility
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCareFacility'
+  /facilities/{uuid}/shifts:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      responses:
+        '200':
+          description: Get HealthCareFacility Shifts list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shifts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shift'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShiftInput'
+      responses:
+        '200':
+          description: Successfully created HealthCareFacility Shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Shift'
+  /workers:
+    get:
+      responses:
+        '200':
+          description: Get HealthCareFacility list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  facilities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HealthCareFacility'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkerInput'
+      responses:
+        '200':
+          description: Successful health check
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+  /workers/{uuid}/shifts:
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      responses:
+        '200':
+          description: Get Worker Shifts list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shifts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shift'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShiftAssignmentInput'
+      responses:
+        '200':
+          description: Successfully applied to Shift
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShiftAssignment'
+  /shifts:
+    get:
+      responses:
+        '200':
+          description: Get all Shifts list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shifts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shift'
