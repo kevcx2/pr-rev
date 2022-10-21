@@ -9,6 +9,10 @@ import { prisma } from "../prismaClient";
 
 type Timestamps = "createdAt" | "updatedAt";
 
+type GenericSuccessResponse = {
+  status: "ok";
+};
+
 export function listAllShifts(): Promise<Shift[]> {
   return prisma.shift.findMany();
 }
@@ -73,4 +77,32 @@ export function rateWorker(
     },
     data: { rating },
   });
+}
+
+export async function blockWorker(
+  workerUuid: Worker["uuid"],
+  shiftUuid: Shift["uuid"],
+  blockReason: string,
+): Promise<GenericSuccessResponse> {
+  const shift = await prisma.shift.findUniqueOrThrow({
+    where: {
+      uuid: shiftUuid,
+    },
+  });
+  const facility = await prisma.healthCareFacility.findUniqueOrThrow({
+    where: {
+      uuid: shift.facilityUuid,
+    },
+  });
+  await prisma.blockedWorker.create({
+    data: {
+      facilityUuid: facility.uuid,
+      shiftUuid,
+      workerUuid,
+      blockReason,
+      createdAt: new Date(),
+    },
+  });
+
+  return { status: "ok" };
 }

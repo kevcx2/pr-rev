@@ -142,6 +142,26 @@ components:
         - shiftUuid
         - workerUuid
         - rating
+    BlockWorkerInput:
+      type: object
+      properties:
+        shiftUuid:
+          type: string
+        workerUuid:
+          type: string
+        blockReason:
+          type: string
+      required:
+        - shiftUuid
+        - workerUuid
+        - blockReason
+    GenericSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
 paths:
   /:
     summary: The application health check
@@ -316,3 +336,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ShiftAssignment'
+  /block-worker:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlockWorkerInput'
+      responses:
+        '200':
+          description: Successfully blocked a Worker from working shifts for a Healthcare facility
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericSuccessResponse'

@@ -6,6 +6,7 @@ import {
 } from "../../core/facilityManagement";
 import {
   applyToShift,
+  blockWorker,
   createShift,
   listAllShifts,
   listHealthCareFacilityShifts,
@@ -82,4 +83,11 @@ v1.post("/rate-worker", async (req, res) => {
   const { workerUuid, shiftUuid, rating } = req.body;
   const shiftAssignment = await rateWorker(workerUuid, shiftUuid, rating);
   res.send(JSON.stringify({ shiftAssignment }));
+});
+
+// Block workers
+v1.post("/block-worker", async (req, res) => {
+  const { workerUuid, shiftUuid, blockReason } = req.body;
+  const result = await blockWorker(workerUuid, shiftUuid, blockReason);
+  res.send(JSON.stringify(result));
 });
